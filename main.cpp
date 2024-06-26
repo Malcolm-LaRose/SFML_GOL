@@ -20,8 +20,6 @@
 #include <vector>
 
 std::mt19937 gen(std::random_device{}());
-constexpr float PI = 3.141592;
-const sf::Color fillColor = Color::BLUEPRINT;
 
 int genRandomInt(const int& min, const int& max) {
 	std::uniform_int_distribution<int> dist(min, max);
@@ -36,7 +34,7 @@ float genRandomFloat(const int& min, const int& max) {
 
 // Subject to change and deletion --> window size determined by cells
 // Char smaller than short (-1 byte)
-constexpr char borderSize = 4;
+constexpr char borderSize = 3;
 
 constexpr char xPos = borderSize;
 constexpr char yPos = borderSize;
@@ -44,14 +42,15 @@ constexpr char yPos = borderSize;
 constexpr int rows = 100;
 constexpr int cols = 100;
 constexpr char cellSpacing = borderSize;
-constexpr char cellSize = 4 * borderSize;
+constexpr char cellSize = 15;
+constexpr char cellDist = cellSize + cellSpacing;
+
+sf::RectangleShape rectangle;
 
 constexpr char targetFPS = 60;
-constexpr int initScreenWidth = 1920;
-constexpr int initScreenHeight = 1080;
+constexpr int initScreenWidth = rows * cellDist + borderSize;
+constexpr int initScreenHeight = rows * cellDist + borderSize;
 
-constexpr int width = initScreenWidth - (2 * borderSize);
-constexpr int height = initScreenHeight - (2 * borderSize);
 
 
 class Cell {
@@ -62,8 +61,8 @@ public:
 		state = st;
 	}
 
-	void flipCellState() { // Ignore IDE, can't be made const
-		state != state;
+	void flipCellState() {
+		state = !state;
 	}
 
 	const bool& getCellState() const {
@@ -79,22 +78,59 @@ private:
 class Grid {
 public:
 
-	const bool& getCellStateAt(const int& row, const int& col) {
-		Cell& cell = grid[row][col];
+	Grid() { // Don't need any special constructors, just change settings
+		grid.resize(rows, std::vector<Cell>(cols));
+		rectangle.setSize(sf::Vector2f(cellSize, cellSize));
+	}
 
+	const std::vector<std::vector<Cell>> getGrid() const {
+		return grid;
+	}
+
+	const bool& getCellStateAt(const int& row, const int& col) const {
+		const Cell& cell = grid[row][col];
+		return cell.getCellState();
 	}
 
 	void updateCellStateAt(const int& row, const int& col, const bool& st) {
 		grid[row][col].updateCellState(st);
 	}
 
+	void flipCellStateAt(const int& row, const int& col) {
+		grid[row][col].flipCellState();
+	}
+
+	void resetGrid() {
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				updateCellStateAt(row, col, false);
+			}
+		}
+	}
+
+	void update() {}
+
 
 private:
 
 	std::vector<std::vector<Cell>> grid;
 
-	int iterNum;
+	int iterNum = 0; // No need for special init here, all initial time steps can be zero
 
+
+};
+
+class GameOfLife {
+public:
+	GameOfLife() {}
+
+	void gameOfLife() {}
+
+	Grid grid;
+
+private:
+
+	const bool isInBounds(const int& row, const int& col) {}
 
 };
 
@@ -113,7 +149,7 @@ public:
 
 
 		// Init background
-		setupVertexBuffer(borderAndBGRect, xPos, yPos, width, height, Color::EIGENGRAU);
+		setupVertexBuffer(borderAndBGRect, 0, 0, initScreenWidth, initScreenHeight, Color::EIGENGRAU);
 		
 
 		// Init Font
@@ -183,17 +219,17 @@ public:
 
 private:
 
+	sf::RenderWindow window;
+	sf::Clock clock;
+	sf::Font font;
 	sf::Text frameText;
 
+	sf::VertexBuffer borderAndBGRect; 
+
+	GameOfLife game;
+	Grid& grid = game.grid;
+
 	bool running = true;
-
-	sf::VertexBuffer borderAndBGRect;
-
-	sf::RenderWindow window;
-
-	sf::Clock clock;
-
-	sf::Font font;
 
 	void initFont() {
 		font.loadFromFile(".\\Montserrat-Regular.ttf");
@@ -216,7 +252,11 @@ private:
 			case sf::Event::MouseButtonPressed:
 				if (event.mouseButton.button == sf::Mouse::Left) {
 					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-					
+					const int& col = mousePos.x / cellDist;
+					const int& row = mousePos.y / cellDist;
+
+					grid.flipCellStateAt(row, col);
+
 				}
 				break;
 			case sf::Event::MouseButtonReleased:
@@ -252,11 +292,35 @@ private:
 		window.draw(borderAndBGRect);
 	}
 
-	
+	void renderGrid() {
+
+		for (int row = 0; row < rows; ++row) {
+			for (int col = 0; col < cols; ++col) {
+				const bool& cellState = grid.getCellStateAt(row, col);
+
+				sf::Color color;
+				if (cellState) {
+					color = Color::PHSORNG;
+				}
+				else {
+					color = Color::DRKGRY;
+				}
+
+				// Position of upper left corner on screen
+				const int x = col * (cellDist)+borderSize;
+				const int y = row * (cellDist)+borderSize;
+
+				rectangle.setPosition(x, y);
+				rectangle.setFillColor(color);
+				window.draw(rectangle);
+			}
+		}
+	}
 
 
 	void renderAll() {
 		renderWorld();
+		renderGrid();
 	}
 
 };
