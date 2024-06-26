@@ -1,17 +1,9 @@
-// THE PLAN
+// Game of Life
 // 
-// 
-// Try something like std::unique_ptr<Ball[]> listOfBalls; --> slower, try manually allocating memory?
-// Learn stack vs. heap
-// std::array -> c style array --> no, vector is faster
-// 
-// Try using a normal distribution instead for jiggle
-// Quadtree screen space partition instead of uniform?
-// Fix collision skipping --> Multiple 'physics frames' per 'render frame'? --> Needs done soon!
-// Dont rerender pixels that didnt change? esp background and border
-// Real physics
-// ????
-// Profit
+// Goals for AFTER completion --> don't touch until GOL works first
+// More than one type of life --> look at examples
+// Automatic updating
+// Menus, controls, etc...
 
 
 #include "color.h"
@@ -40,6 +32,71 @@ float genRandomFloat(const int& min, const int& max) {
 	std::uniform_real_distribution<float> dist(min, max);
 	return dist(gen);
 }
+
+
+// Subject to change and deletion --> window size determined by cells
+// Char smaller than short (-1 byte)
+constexpr char borderSize = 4;
+
+constexpr char xPos = borderSize;
+constexpr char yPos = borderSize;
+
+constexpr int rows = 100;
+constexpr int cols = 100;
+constexpr char cellSpacing = borderSize;
+constexpr char cellSize = 4 * borderSize;
+
+constexpr char targetFPS = 60;
+constexpr int initScreenWidth = 1920;
+constexpr int initScreenHeight = 1080;
+
+constexpr int width = initScreenWidth - (2 * borderSize);
+constexpr int height = initScreenHeight - (2 * borderSize);
+
+
+class Cell {
+public:
+	Cell() : state(false) {}
+
+	virtual void updateCellState(const bool& st) {
+		state = st;
+	}
+
+	void flipCellState() { // Ignore IDE, can't be made const
+		state != state;
+	}
+
+	const bool& getCellState() const {
+		return state;
+	}
+
+
+private:
+	bool state;
+
+};
+
+class Grid {
+public:
+
+	const bool& getCellStateAt(const int& row, const int& col) {
+		Cell& cell = grid[row][col];
+
+	}
+
+	void updateCellStateAt(const int& row, const int& col, const bool& st) {
+		grid[row][col].updateCellState(st);
+	}
+
+
+private:
+
+	std::vector<std::vector<Cell>> grid;
+
+	int iterNum;
+
+
+};
 
 
 
@@ -93,7 +150,7 @@ public:
 	}
 
 
-	void frameCounterDisplay(const float& frameTime, const float& avg) {
+	void frameCounterDisplay(const int& frameTime, const int& avg) {
 		frameText.setString("FrameTime (us): " + std::to_string(frameTime) + "\nAvg. FPS: " + std::to_string(avg));
 
 		window.draw(frameText);
@@ -129,18 +186,6 @@ private:
 	sf::Text frameText;
 
 	bool running = true;
-
-	static constexpr short borderSize = 4;
-
-	static constexpr int xPos = borderSize;
-	static constexpr int yPos = borderSize;
-
-	static constexpr short targetFPS = 60;
-	static constexpr int initScreenWidth = 1920;
-	static constexpr int initScreenHeight = 1080;
-
-	static constexpr int width = initScreenWidth - (2 * borderSize);
-	static constexpr int height = initScreenHeight - (2 * borderSize);
 
 	sf::VertexBuffer borderAndBGRect;
 
