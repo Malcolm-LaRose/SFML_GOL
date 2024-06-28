@@ -108,7 +108,9 @@ public:
 		}
 	}
 
-	void update() {}
+	void incIterNum() {
+		++iterNum;
+	}
 
 
 private:
@@ -124,13 +126,77 @@ class GameOfLife {
 public:
 	GameOfLife() {}
 
-	void gameOfLife() {}
+	void gameOfLife() {
+		Grid updatedGrid;
+		bool gridChanged = false;
+
+		for (int row = 0; row < rows; row++) { // Make sure not to check edges
+			for (int col = 0; col < cols; col++) {
+				int numAlive = checkMooreNeighborhoodFor(row, col, true);
+
+				const bool& currentCellState = grid.getCellStateAt(row, col);
+
+				// Actual GoL
+				if (currentCellState) {
+					if (numAlive < 2 || numAlive > 3) {
+						updatedGrid.updateCellStateAt(row, col, false);
+					if (!gridChanged) gridChanged = true;
+					}
+					else {
+						updatedGrid.updateCellStateAt(row, col, true);
+					}
+				}
+				else {
+					if (numAlive == 3) {
+						updatedGrid.updateCellStateAt(row, col, true);
+						if (!gridChanged) gridChanged = true;
+					}
+				}
+
+
+			}
+		}
+
+		for (int row = 0; row < rows; ++row) {
+			for (int col = 0; col < cols; ++col) {
+				bool nextState = updatedGrid.getCellStateAt(row, col);
+				grid.updateCellStateAt(row, col, nextState);
+			}
+		}
+		grid.incIterNum();
+
+	}
 
 	Grid grid;
 
 private:
 
-	const bool isInBounds(const int& row, const int& col) {}
+	const bool isInBounds(const int& row, const int& col) {
+		if (row < 0 || col < 0) {
+			return false;
+		}
+		if (row >= rows || col >= cols) {
+			return false;
+		}
+
+		else {
+			return true;
+		}
+	}
+
+	const int& checkMooreNeighborhoodFor(const int& row, const int& col, bool st) {
+		int count = 0;
+		for (int i = -1; i <= 1; ++i) {
+			for (int j = -1; j <= 1; ++j) {
+				if (i == 0 && j == 0) continue;
+				if (isInBounds(row + i, col + j) && (grid.getCellStateAt(row + i, col + j) == st)) {
+					count++;
+				}
+			}
+		}
+
+		return count;
+	}
 
 };
 
@@ -269,7 +335,9 @@ private:
 				break;
 
 				case sf::Event::KeyPressed:
-					
+					if (event.key.code == sf::Keyboard::Space) {
+						game.gameOfLife();
+					}
 					break;
 				
 			}
@@ -283,9 +351,6 @@ private:
 
 		
 	}
-
-
-
 
 
 	void renderWorld() {
