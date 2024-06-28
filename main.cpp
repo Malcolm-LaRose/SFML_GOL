@@ -7,6 +7,7 @@
 
 
 #include "color.h"
+#include "Settings.h"
 
 #include <GL/glew.h>
 
@@ -32,6 +33,7 @@ float genRandomFloat(const int& min, const int& max) {
 }
 
 
+GoL_Settings& gols = GoL_Settings::getSettings();
 // Subject to change and deletion --> window size determined by cells
 // Char smaller than short (-1 byte)
 constexpr char borderSize = 3;
