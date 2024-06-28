@@ -15,7 +15,6 @@
 #include <SFML/Graphics.hpp>
 
 #include <array>
-#include <random>
 #include <cmath>
 #include <iostream>
 #include <string>
@@ -77,6 +76,16 @@ public:
 		for (int row = 0; row < gols.rows; row++) {
 			for (int col = 0; col < gols.cols; col++) {
 				updateCellStateAt(row, col, false);
+				iterNum = 0;
+			}
+		}
+	}
+
+	void randomizeGrid() {
+		for (int row = 0; row < gols.rows; row++) {
+			for (int col = 0; col < gols.cols; col++) {
+				updateCellStateAt(row, col, false);
+				iterNum = 0;
 			}
 		}
 	}
@@ -309,6 +318,9 @@ private:
 			case sf::Event::KeyPressed:
 				if (event.key.code == sf::Keyboard::Space) {
 					game.gameOfLife();
+				}
+				if (event.key.code == sf::Keyboard::R) {
+					game.grid.resetGrid(); // This is why we wanted grid to be public (private seems overused!)
 				}
 				break;
 			}

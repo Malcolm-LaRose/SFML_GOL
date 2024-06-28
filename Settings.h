@@ -4,6 +4,8 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include <random>
+
 struct GoL_Settings {
 
 	static GoL_Settings& getSettings() {
@@ -45,6 +47,11 @@ int genRandomInt(const int& min, const int& max) {
 
 float genRandomFloat(const int& min, const int& max) {
 	std::uniform_real_distribution<float> dist(min, max);
+	return dist(gen);
+}
+
+bool genRandomBool(const float& pTrue) {
+	std::bernoulli_distribution dist(pTrue);
 	return dist(gen);
 }
 
