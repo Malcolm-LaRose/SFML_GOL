@@ -189,7 +189,10 @@ private:
 		for (int i = -1; i <= 1; ++i) {
 			for (int j = -1; j <= 1; ++j) {
 				if (i == 0 && j == 0) continue;
-				if (isInBounds(row + i, col + j) && (grid.getCellStateAt(row + i, col + j) == st)) {
+				if (!isInBounds(row + i, col + j)) {
+					continue;
+				}
+				if ((grid.getCellStateAt(row + i, col + j) == st)) {
 					count++;
 				}
 			}
@@ -268,7 +271,6 @@ public:
 		while (running) {
 
 			handleEvents();
-			updateLogic();
 			renderAll();
 
 			frameTime = clock.restart().asMicroseconds();
@@ -327,29 +329,17 @@ private:
 				break;
 			case sf::Event::MouseButtonReleased:
 				if (event.mouseButton.button == sf::Mouse::Left) {
-					
+
 				}
 				break;
-			case sf::Event::MouseMoved:
-				
-				break;
 
-				case sf::Event::KeyPressed:
-					if (event.key.code == sf::Keyboard::Space) {
-						game.gameOfLife();
-					}
-					break;
-				
+			case sf::Event::KeyPressed:
+				if (event.key.code == sf::Keyboard::Space) {
+					game.gameOfLife();
+				}
+				break;
 			}
 		}
-	}
-
-
-	
-
-	void updateLogic() {
-
-		
 	}
 
 
