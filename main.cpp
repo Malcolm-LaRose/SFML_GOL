@@ -34,24 +34,6 @@ float genRandomFloat(const int& min, const int& max) {
 
 
 GoL_Settings& gols = GoL_Settings::getSettings();
-// Subject to change and deletion --> window size determined by cells
-// Char smaller than short (-1 byte)
-constexpr char borderSize = 3;
-
-constexpr char xPos = borderSize;
-constexpr char yPos = borderSize;
-
-constexpr int rows = 100;
-constexpr int cols = 100;
-constexpr char cellSpacing = borderSize;
-constexpr char cellSize = 15;
-constexpr char cellDist = cellSize + cellSpacing;
-
-sf::RectangleShape rectangle;
-
-constexpr char targetFPS = 60;
-constexpr int initScreenWidth = rows * cellDist + borderSize;
-constexpr int initScreenHeight = rows * cellDist + borderSize;
 
 
 
@@ -81,8 +63,8 @@ class Grid {
 public:
 
 	Grid() { // Don't need any special constructors, just change settings
-		grid.resize(rows, std::vector<Cell>(cols));
-		rectangle.setSize(sf::Vector2f(cellSize, cellSize));
+		grid.resize(gols.rows, std::vector<Cell>(gols.cols));
+		gols.rectangle.setSize(sf::Vector2f(gols.cellSize, gols.cellSize));
 	}
 
 	const std::vector<std::vector<Cell>> getGrid() const {
@@ -103,8 +85,8 @@ public:
 	}
 
 	void resetGrid() {
-		for (int row = 0; row < rows; row++) {
-			for (int col = 0; col < cols; col++) {
+		for (int row = 0; row < gols.rows; row++) {
+			for (int col = 0; col < gols.cols; col++) {
 				updateCellStateAt(row, col, false);
 			}
 		}
@@ -132,8 +114,8 @@ public:
 		Grid updatedGrid;
 		bool gridChanged = false;
 
-		for (int row = 0; row < rows; row++) { // Make sure not to check edges
-			for (int col = 0; col < cols; col++) {
+		for (int row = 0; row < gols.rows; row++) { // Make sure not to check edges
+			for (int col = 0; col < gols.cols; col++) {
 				int numAlive = checkMooreNeighborhoodFor(row, col, true);
 
 				const bool& currentCellState = grid.getCellStateAt(row, col);
@@ -159,8 +141,8 @@ public:
 			}
 		}
 
-		for (int row = 0; row < rows; ++row) {
-			for (int col = 0; col < cols; ++col) {
+		for (int row = 0; row < gols.rows; ++row) {
+			for (int col = 0; col < gols.cols; ++col) {
 				bool nextState = updatedGrid.getCellStateAt(row, col);
 				grid.updateCellStateAt(row, col, nextState);
 			}
@@ -177,7 +159,7 @@ private:
 		if (row < 0 || col < 0) {
 			return false;
 		}
-		if (row >= rows || col >= cols) {
+		if (row >= gols.rows || col >= gols.cols) {
 			return false;
 		}
 
@@ -213,21 +195,21 @@ public:
 	World() {
 
 		// Init SFML
-		window.create(sf::VideoMode(initScreenWidth, initScreenHeight), "Physics Box", sf::Style::Titlebar | sf::Style::Close);
+		window.create(sf::VideoMode(gols.initScreenWidth, gols.initScreenHeight), "Physics Box", sf::Style::Titlebar | sf::Style::Close);
 		window.setKeyRepeatEnabled(false);
 		window.setVerticalSyncEnabled(false); // Probably ignored by driver
 		// window.setFramerateLimit(targetFPS);
 
 
 		// Init background
-		setupVertexBuffer(borderAndBGRect, 0, 0, initScreenWidth, initScreenHeight, Color::EIGENGRAU);
+		setupVertexBuffer(borderAndBGRect, 0, 0, gols.initScreenWidth, gols.initScreenHeight, Color::EIGENGRAU);
 		
 
 		// Init Font
 		initFont();
 
 		// Set framecounter position
-		frameText.setPosition(borderSize, borderSize);
+		frameText.setPosition(gols.borderSize, gols.borderSize);
 	}
 
 	void setupVertexBuffer(sf::VertexBuffer& vertexBuffer, const int& xPos, const int& yPos, const int& width, const int& height, const sf::Color& color) {
@@ -322,8 +304,8 @@ private:
 			case sf::Event::MouseButtonPressed:
 				if (event.mouseButton.button == sf::Mouse::Left) {
 					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-					const int& col = mousePos.x / cellDist;
-					const int& row = mousePos.y / cellDist;
+					const int& col = mousePos.x / gols.cellDist;
+					const int& row = mousePos.y / gols.cellDist;
 
 					grid.flipCellStateAt(row, col);
 
@@ -351,8 +333,8 @@ private:
 
 	void renderGrid() {
 
-		for (int row = 0; row < rows; ++row) {
-			for (int col = 0; col < cols; ++col) {
+		for (int row = 0; row < gols.rows; ++row) {
+			for (int col = 0; col < gols.cols; ++col) {
 				const bool& cellState = grid.getCellStateAt(row, col);
 
 				sf::Color color;
@@ -364,12 +346,12 @@ private:
 				}
 
 				// Position of upper left corner on screen
-				const int x = col * (cellDist)+borderSize;
-				const int y = row * (cellDist)+borderSize;
+				const int x = col * (gols.cellDist) + gols.borderSize;
+				const int y = row * (gols.cellDist) + gols.borderSize;
 
-				rectangle.setPosition(x, y);
-				rectangle.setFillColor(color);
-				window.draw(rectangle);
+				gols.rectangle.setPosition(x, y);
+				gols.rectangle.setFillColor(color);
+				window.draw(gols.rectangle);
 			}
 		}
 	}
