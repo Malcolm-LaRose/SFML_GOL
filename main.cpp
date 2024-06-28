@@ -84,7 +84,8 @@ public:
 	void randomizeGrid() {
 		for (int row = 0; row < gols.rows; row++) {
 			for (int col = 0; col < gols.cols; col++) {
-				updateCellStateAt(row, col, false);
+				const bool& randBool = genRandomBool(0.5f);
+				updateCellStateAt(row, col, randBool);
 				iterNum = 0;
 			}
 		}
@@ -321,6 +322,9 @@ private:
 				}
 				if (event.key.code == sf::Keyboard::R) {
 					game.grid.resetGrid(); // This is why we wanted grid to be public (private seems overused!)
+				}
+				if (event.key.code == sf::Keyboard::Z) {
+					game.grid.randomizeGrid(); 
 				}
 				break;
 			}
