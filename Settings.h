@@ -34,5 +34,19 @@ private:
 
 };
 
+// Random number generation
+
+std::mt19937 gen(std::random_device{}());
+
+int genRandomInt(const int& min, const int& max) {
+	std::uniform_int_distribution<int> dist(min, max);
+	return dist(gen);
+}
+
+float genRandomFloat(const int& min, const int& max) {
+	std::uniform_real_distribution<float> dist(min, max);
+	return dist(gen);
+}
+
 
 #endif

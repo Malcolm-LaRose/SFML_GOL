@@ -1,9 +1,10 @@
 // Game of Life
 // 
-// Goals for AFTER completion --> don't touch until GOL works first
-// More than one type of life --> look at examples
+// Goals for AFTER completion --> don't touch until GOL works first, do roughly in order
 // Automatic updating
 // Menus, controls, etc...
+// Options
+// More than one type of life --> look at examples
 
 
 #include "color.h"
@@ -19,18 +20,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
-std::mt19937 gen(std::random_device{}());
-
-int genRandomInt(const int& min, const int& max) {
-	std::uniform_int_distribution<int> dist(min, max);
-	return dist(gen);
-}
-
-float genRandomFloat(const int& min, const int& max) {
-	std::uniform_real_distribution<float> dist(min, max);
-	return dist(gen);
-}
 
 
 GoL_Settings& gols = GoL_Settings::getSettings();
