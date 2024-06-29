@@ -30,6 +30,8 @@ struct GoL_Settings {
 	static constexpr int initScreenWidth = rows * cellDist + borderSize;
 	static constexpr int initScreenHeight = rows * cellDist + borderSize;
 
+	static constexpr char stepsPerSec = 4;
+
 private:
 
 	GoL_Settings() {} // Ensure we don't delete the default constructor

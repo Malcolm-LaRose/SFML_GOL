@@ -100,7 +100,7 @@ private:
 
 	std::vector<std::vector<Cell>> grid;
 
-	int iterNum = 0; // No need for special init here, all initial time steps can be zero
+	int iterNum = 0;
 
 
 };
@@ -281,6 +281,7 @@ private:
 	Grid& grid = game.grid;
 
 	bool running = true;
+	bool paused = true; // Start paused
 
 	void initFont() {
 		font.loadFromFile(".\\Montserrat-Regular.ttf");
@@ -317,8 +318,11 @@ private:
 				break;
 
 			case sf::Event::KeyPressed:
-				if (event.key.code == sf::Keyboard::Space) {
+				if (event.key.code == sf::Keyboard::Space) { // Single step
 					game.gameOfLife();
+				}
+				if (event.key.code == sf::Keyboard::P) { // Pause/unpause continuous stepping
+					
 				}
 				if (event.key.code == sf::Keyboard::R) {
 					game.grid.resetGrid(); // This is why we wanted grid to be public (private seems overused!)
