@@ -3,7 +3,8 @@
 // Goals for AFTER completion --> don't touch until GOL works first, do roughly in order
 // Automatic updating DONE
 // Rendering optimization DONE
-// Big window, small res (640/360) --> SFML view
+// Framerate display optimization
+// Blue cell under cursor
 // Menus, controls, etc...
 // Options
 // More than one type of life --> look at examples
@@ -275,13 +276,14 @@ public:
 			timer += frameTime / 1000000.0f;
 
 			handleEvents();
-			if (!paused && timer >= delay) {
-				update();
+			if (timer >= delay) {
+				if (!paused) {
+					update();
+				}
+				frameCounterDisplay(frameTime, frameCount / (totalFrameTime / 1000000));
 				timer -= delay;
 			}
 			renderAll();
-
-			frameCounterDisplay(frameTime, frameCount / (totalFrameTime / 1000000));
 			frameCount++;
 			window.display();
 
@@ -312,7 +314,7 @@ private:
 
 	void initFont() {
 		font.loadFromFile(".\\Montserrat-Regular.ttf");
-		frameText.setCharacterSize(34);
+		frameText.setCharacterSize(24);
 		frameText.setFillColor(Color::WHITE);
 		frameText.setFont(font);
 	}
