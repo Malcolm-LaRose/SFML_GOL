@@ -2,6 +2,7 @@
 // 
 // Goals for AFTER completion --> don't touch until GOL works first, do roughly in order
 // Automatic updating DONE
+// Rendering optimization DONE
 // Big window, small res (640/360) --> SFML view
 // Menus, controls, etc...
 // Options
@@ -381,10 +382,61 @@ private:
 		}
 	}
 
+	void vertexRenderGrid() {
+		sf::VertexArray cells(sf::Triangles, gols.rows * gols.cols * 6);
+
+
+		int i = 0;
+		for (int row = 0; row < gols.rows; ++row) {
+			for (int col = 0; col < gols.cols; ++col) {
+				// Position of upper left corner of cell
+				const int x = col * (gols.cellDist) + gols.borderSize;
+				const int y = row * (gols.cellDist) + gols.borderSize;
+
+				const bool& cellState = grid.getCellStateAt(row, col);
+
+				sf::Color color;
+				if (cellState) {
+					color = Color::PHSORNG;
+				}
+				else {
+					color = Color::DRKGRY;
+				}
+
+				// If gols.celldist = 1, we only need to light up one pixel
+				if (gols.cellDist == 1) {
+					cells[i].position = sf::Vector2f(x, y);
+					cells[i].color = color; // Change this to the desired color
+					i++;
+				}
+				else {
+					// First triangle (top-left, top-right, bottom-right)
+					cells[i].position = sf::Vector2f(x, y);
+					cells[i + 1].position = sf::Vector2f(x + gols.cellDist, y);
+					cells[i + 2].position = sf::Vector2f(x + gols.cellDist, y + gols.cellDist);
+
+					// Second triangle (top-left, bottom-right, bottom-left)
+					cells[i + 3].position = sf::Vector2f(x, y);
+					cells[i + 4].position = sf::Vector2f(x + gols.cellDist, y + gols.cellDist);
+					cells[i + 5].position = sf::Vector2f(x, y + gols.cellDist);
+
+					// Set the color of the vertices
+					for (int j = 0; j < 6; ++j) {
+						cells[i + j].color = color; // Change this to the desired color
+					}
+
+					i += 6; // Move to the next set of vertices
+				}
+			}
+		}
+		window.draw(cells);
+	}
+
 
 	void renderAll() {
 		renderWorld();
-		renderGrid();
+		vertexRenderGrid();
+		//renderGrid();
 	}
 
 };
