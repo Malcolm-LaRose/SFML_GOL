@@ -376,8 +376,6 @@ private:
 
 	void calcVertices() {
 		if (gols.cellDist == 1) {
-			// Use sf::Points for single pixel cells
-			sf::VertexArray cells(sf::Points, gols.rows * gols.cols);
 
 			int i = 0;
 			for (int row = 0; row < gols.rows; ++row) {
@@ -396,9 +394,6 @@ private:
 			}
 		}
 		else {
-			sf::VertexArray cells(sf::Triangles, gols.rows * gols.cols * 6);
-
-
 			int i = 0;
 			for (int row = 0; row < gols.rows; ++row) {
 				for (int col = 0; col < gols.cols; ++col) {
@@ -442,20 +437,15 @@ private:
 	void vertexRenderGrid() {
 
 		if (gols.cellDist == 1) {
-			// Use sf::Points for single pixel cells
-			sf::VertexArray cells(sf::Points, gols.rows * gols.cols);
 
 			int i = 0;
 			for (int row = 0; row < gols.rows; ++row) {
 				for (int col = 0; col < gols.cols; ++col) {
-					const int x = col * (gols.cellDist) + gols.borderSize;
-					const int y = row * (gols.cellDist) + gols.borderSize;
 
 					const bool& cellState = grid.getCellStateAt(row, col);
 
 					sf::Color color = cellState ? Color::PHSORNG : Color::DRKGRY;
 
-					cells[i].position = sf::Vector2f(x, y);
 					cells[i].color = color;
 					++i;
 				}
@@ -464,15 +454,10 @@ private:
 			window.draw(cells);
 		}
 		else {
-			sf::VertexArray cells(sf::Triangles, gols.rows * gols.cols * 6);
-
-
 			int i = 0;
 			for (int row = 0; row < gols.rows; ++row) {
 				for (int col = 0; col < gols.cols; ++col) {
-					// Position of upper left corner of cell
-					const int x = col * (gols.cellDist) + gols.borderSize;
-					const int y = row * (gols.cellDist) + gols.borderSize;
+
 
 					const bool& cellState = grid.getCellStateAt(row, col);
 
@@ -483,17 +468,6 @@ private:
 					else {
 						color = Color::DRKGRY;
 					}
-
-					
-					// First triangle (top-left, top-right, bottom-right)
-					cells[i].position = sf::Vector2f(x, y);
-					cells[i + 1].position = sf::Vector2f(x + gols.cellDist, y);
-					cells[i + 2].position = sf::Vector2f(x + gols.cellDist, y + gols.cellDist);
-
-					// Second triangle (top-left, bottom-right, bottom-left)
-					cells[i + 3].position = sf::Vector2f(x, y);
-					cells[i + 4].position = sf::Vector2f(x + gols.cellDist, y + gols.cellDist);
-					cells[i + 5].position = sf::Vector2f(x, y + gols.cellDist);
 
 					// Set the color of the vertices
 					for (int j = 0; j < 6; ++j) {
