@@ -18,8 +18,8 @@ struct GoL_Settings {
 	static constexpr char xPos = borderSize;
 	static constexpr char yPos = borderSize;
 
-	static constexpr int rows = 320; // 640
-	static constexpr int cols = 180; // 360
+	static constexpr int cols = 320; // 640 --> x dir
+	static constexpr int rows = 180; // 360 --> y dir
 	static constexpr char cellSpacing = borderSize;
 	static constexpr char cellSize = 2;
 	static constexpr char cellDist = cellSize + cellSpacing;
@@ -27,8 +27,8 @@ struct GoL_Settings {
 	sf::RectangleShape rectangle;
 
 	static constexpr char targetFPS = 60;
-	static constexpr int initScreenWidth = rows * cellDist + borderSize;
-	static constexpr int initScreenHeight = cols * cellDist + borderSize;
+	static constexpr int initScreenWidth = cols * cellDist + borderSize;
+	static constexpr int initScreenHeight = rows * cellDist + borderSize;
 
 	static constexpr char stepsPerSec = 4;
 

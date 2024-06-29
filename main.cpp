@@ -314,8 +314,8 @@ private:
 			case sf::Event::MouseButtonPressed:
 				if (event.mouseButton.button == sf::Mouse::Left) {
 					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-					const int& row = mousePos.x / gols.cellDist;
-					const int& col = mousePos.y / gols.cellDist;
+					const int& col = mousePos.x / gols.cellDist;
+					const int& row = mousePos.y / gols.cellDist;
 
 					grid.flipCellStateAt(row, col);
 
@@ -390,8 +390,8 @@ private:
 		for (int row = 0; row < gols.rows; ++row) {
 			for (int col = 0; col < gols.cols; ++col) {
 				// Position of upper left corner of cell
-				const int x = row * (gols.cellDist) + gols.borderSize;
-				const int y = col * (gols.cellDist) + gols.borderSize;
+				const int x = col * (gols.cellDist) + gols.borderSize;
+				const int y = row * (gols.cellDist) + gols.borderSize;
 
 				const bool& cellState = grid.getCellStateAt(row, col);
 
