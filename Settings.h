@@ -13,15 +13,15 @@ struct GoL_Settings {
 		return instance;
 	}
 
-	static constexpr char borderSize = 3;
+	static constexpr char borderSize = 1;
 
 	static constexpr char xPos = borderSize;
 	static constexpr char yPos = borderSize;
 
-	static constexpr int rows = 100;
-	static constexpr int cols = 100;
+	static constexpr int rows = 100; // 640
+	static constexpr int cols = 100; // 360
 	static constexpr char cellSpacing = borderSize;
-	static constexpr char cellSize = 15;
+	static constexpr char cellSize = 4;
 	static constexpr char cellDist = cellSize + cellSpacing;
 
 	sf::RectangleShape rectangle;

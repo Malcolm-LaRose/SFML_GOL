@@ -1,7 +1,8 @@
 // Game of Life
 // 
 // Goals for AFTER completion --> don't touch until GOL works first, do roughly in order
-// Automatic updating
+// Automatic updating DONE
+// Big window, small res (640/360) --> SFML view
 // Menus, controls, etc...
 // Options
 // More than one type of life --> look at examples
@@ -250,14 +251,21 @@ public:
 		float totalFrameTime = 0;
 		int frameCount = 0;
 
+		const float& delay = 1.0f / gols.stepsPerSec;
+
 
 		while (running) {
 
-			handleEvents();
-			renderAll();
-
 			frameTime = clock.restart().asMicroseconds();
 			totalFrameTime += frameTime;
+			timer += frameTime / 1000000.0f;
+
+			handleEvents();
+			if (!paused && timer >= delay) {
+				update();
+				timer -= delay;
+			}
+			renderAll();
 
 			frameCounterDisplay(frameTime, frameCount / (totalFrameTime / 1000000));
 			frameCount++;
@@ -282,6 +290,7 @@ private:
 
 	bool running = true;
 	bool paused = true; // Start paused
+	float timer = 0; // For simtime calcs
 
 	void initFont() {
 		font.loadFromFile(".\\Montserrat-Regular.ttf");
@@ -319,10 +328,13 @@ private:
 
 			case sf::Event::KeyPressed:
 				if (event.key.code == sf::Keyboard::Space) { // Single step
-					game.gameOfLife();
+					update();
 				}
 				if (event.key.code == sf::Keyboard::P) { // Pause/unpause continuous stepping
-					
+					paused = !paused;
+					if (!paused) {
+						timer = 0.0f;
+					}
 				}
 				if (event.key.code == sf::Keyboard::R) {
 					game.grid.resetGrid(); // This is why we wanted grid to be public (private seems overused!)
@@ -333,6 +345,10 @@ private:
 				break;
 			}
 		}
+	}
+
+	void update() {
+		game.gameOfLife();
 	}
 
 
