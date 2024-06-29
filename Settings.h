@@ -18,13 +18,11 @@ struct GoL_Settings {
 	static constexpr char xPos = borderSize;
 	static constexpr char yPos = borderSize;
 
-	static constexpr int cols = 320; // 640 --> x dir
-	static constexpr int rows = 180; // 360 --> y dir
+	static constexpr int cols = 730; // 640 --> x dir
+	static constexpr int rows = 410; // 360 --> y dir
 	static constexpr char cellSpacing = borderSize;
-	static constexpr char cellSize = 2;
+	static constexpr char cellSize = 3;
 	static constexpr char cellDist = cellSize + cellSpacing;
-
-	sf::RectangleShape rectangle;
 
 	static constexpr char targetFPS = 60;
 	static constexpr int initScreenWidth = cols * cellDist + borderSize;

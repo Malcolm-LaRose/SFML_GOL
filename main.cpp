@@ -52,9 +52,8 @@ private:
 class Grid {
 public:
 
-	Grid() { // Don't need any special constructors, just change settings
+	Grid() {
 		grid.resize(gols.rows, std::vector<Cell>(gols.cols));
-		gols.rectangle.setSize(sf::Vector2f(gols.cellSize, gols.cellSize));
 	}
 
 	const std::vector<std::vector<Cell>> getGrid() const {
@@ -204,13 +203,27 @@ public:
 
 		// Init background
 		setupVertexBuffer(borderAndBGRect, 0, 0, gols.initScreenWidth, gols.initScreenHeight, Color::EIGENGRAU);
-		
+
+		// Calculate cell positions
+		if (gols.cellDist == 1) {
+			cells.setPrimitiveType(sf::Points);
+			cells.resize(gols.rows * gols.cols);
+		}
+		else {
+			cells.setPrimitiveType(sf::Triangles);
+			cells.resize(gols.rows * gols.cols * 6);
+		}
+		calcVertices();
 
 		// Init Font
 		initFont();
 
 		// Set framecounter position
 		frameText.setPosition(gols.borderSize, gols.borderSize);
+	}
+
+	~World() {
+		borderAndBGRect.~VertexBuffer();
 	}
 
 	void setupVertexBuffer(sf::VertexBuffer& vertexBuffer, const int& xPos, const int& yPos, const int& width, const int& height, const sf::Color& color) {
@@ -273,6 +286,9 @@ public:
 			window.display();
 
 		}
+
+		
+
 	}
 
 
@@ -285,6 +301,7 @@ private:
 	sf::Text frameText;
 
 	sf::VertexBuffer borderAndBGRect; 
+	sf::VertexArray cells;
 
 	GameOfLife game;
 	Grid& grid = game.grid;
@@ -357,59 +374,49 @@ private:
 		window.draw(borderAndBGRect);
 	}
 
-	void renderGrid() {
+	void calcVertices() {
+		if (gols.cellDist == 1) {
+			// Use sf::Points for single pixel cells
+			sf::VertexArray cells(sf::Points, gols.rows * gols.cols);
 
-		for (int row = 0; row < gols.rows; ++row) {
-			for (int col = 0; col < gols.cols; ++col) {
-				const bool& cellState = grid.getCellStateAt(row, col);
+			int i = 0;
+			for (int row = 0; row < gols.rows; ++row) {
+				for (int col = 0; col < gols.cols; ++col) {
+					const int x = col * (gols.cellDist) + gols.borderSize;
+					const int y = row * (gols.cellDist) + gols.borderSize;
 
-				sf::Color color;
-				if (cellState) {
-					color = Color::PHSORNG;
+					const bool& cellState = grid.getCellStateAt(row, col);
+
+					sf::Color color = cellState ? Color::PHSORNG : Color::DRKGRY;
+
+					cells[i].position = sf::Vector2f(x, y);
+					cells[i].color = color;
+					++i;
 				}
-				else {
-					color = Color::DRKGRY;
-				}
-
-				// Position of upper left corner on screen
-				const int x = col * (gols.cellDist) + gols.borderSize;
-				const int y = row * (gols.cellDist) + gols.borderSize;
-
-				gols.rectangle.setPosition(x, y);
-				gols.rectangle.setFillColor(color);
-				window.draw(gols.rectangle);
 			}
 		}
-	}
-
-	void vertexRenderGrid() {
-		sf::VertexArray cells(sf::Triangles, gols.rows * gols.cols * 6);
+		else {
+			sf::VertexArray cells(sf::Triangles, gols.rows * gols.cols * 6);
 
 
-		int i = 0;
-		for (int row = 0; row < gols.rows; ++row) {
-			for (int col = 0; col < gols.cols; ++col) {
-				// Position of upper left corner of cell
-				const int x = col * (gols.cellDist) + gols.borderSize;
-				const int y = row * (gols.cellDist) + gols.borderSize;
+			int i = 0;
+			for (int row = 0; row < gols.rows; ++row) {
+				for (int col = 0; col < gols.cols; ++col) {
+					// Position of upper left corner of cell
+					const int x = col * (gols.cellDist) + gols.borderSize;
+					const int y = row * (gols.cellDist) + gols.borderSize;
 
-				const bool& cellState = grid.getCellStateAt(row, col);
+					const bool& cellState = grid.getCellStateAt(row, col);
 
-				sf::Color color;
-				if (cellState) {
-					color = Color::PHSORNG;
-				}
-				else {
-					color = Color::DRKGRY;
-				}
+					sf::Color color;
+					if (cellState) {
+						color = Color::PHSORNG;
+					}
+					else {
+						color = Color::DRKGRY;
+					}
 
-				// If gols.celldist = 1, we only need to light up one pixel
-				if (gols.cellDist == 1) {
-					cells[i].position = sf::Vector2f(x, y);
-					cells[i].color = color; // Change this to the desired color
-					i++;
-				}
-				else {
+
 					// First triangle (top-left, top-right, bottom-right)
 					cells[i].position = sf::Vector2f(x, y);
 					cells[i + 1].position = sf::Vector2f(x + gols.cellDist, y);
@@ -426,17 +433,85 @@ private:
 					}
 
 					i += 6; // Move to the next set of vertices
+
 				}
 			}
 		}
-		window.draw(cells);
+	}
+
+	void vertexRenderGrid() {
+
+		if (gols.cellDist == 1) {
+			// Use sf::Points for single pixel cells
+			sf::VertexArray cells(sf::Points, gols.rows * gols.cols);
+
+			int i = 0;
+			for (int row = 0; row < gols.rows; ++row) {
+				for (int col = 0; col < gols.cols; ++col) {
+					const int x = col * (gols.cellDist) + gols.borderSize;
+					const int y = row * (gols.cellDist) + gols.borderSize;
+
+					const bool& cellState = grid.getCellStateAt(row, col);
+
+					sf::Color color = cellState ? Color::PHSORNG : Color::DRKGRY;
+
+					cells[i].position = sf::Vector2f(x, y);
+					cells[i].color = color;
+					++i;
+				}
+			}
+
+			window.draw(cells);
+		}
+		else {
+			sf::VertexArray cells(sf::Triangles, gols.rows * gols.cols * 6);
+
+
+			int i = 0;
+			for (int row = 0; row < gols.rows; ++row) {
+				for (int col = 0; col < gols.cols; ++col) {
+					// Position of upper left corner of cell
+					const int x = col * (gols.cellDist) + gols.borderSize;
+					const int y = row * (gols.cellDist) + gols.borderSize;
+
+					const bool& cellState = grid.getCellStateAt(row, col);
+
+					sf::Color color;
+					if (cellState) {
+						color = Color::PHSORNG;
+					}
+					else {
+						color = Color::DRKGRY;
+					}
+
+					
+					// First triangle (top-left, top-right, bottom-right)
+					cells[i].position = sf::Vector2f(x, y);
+					cells[i + 1].position = sf::Vector2f(x + gols.cellDist, y);
+					cells[i + 2].position = sf::Vector2f(x + gols.cellDist, y + gols.cellDist);
+
+					// Second triangle (top-left, bottom-right, bottom-left)
+					cells[i + 3].position = sf::Vector2f(x, y);
+					cells[i + 4].position = sf::Vector2f(x + gols.cellDist, y + gols.cellDist);
+					cells[i + 5].position = sf::Vector2f(x, y + gols.cellDist);
+
+					// Set the color of the vertices
+					for (int j = 0; j < 6; ++j) {
+						cells[i + j].color = color; // Change this to the desired color
+					}
+
+					i += 6; // Move to the next set of vertices
+					
+				}
+			}
+			window.draw(cells);
+		}
 	}
 
 
 	void renderAll() {
 		renderWorld();
 		vertexRenderGrid();
-		//renderGrid();
 	}
 
 };
