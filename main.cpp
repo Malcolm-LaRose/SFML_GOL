@@ -381,20 +381,22 @@ private:
 				break;
 			case sf::Event::MouseButtonPressed:
 				if (event.mouseButton.button == sf::Mouse::Left) {
-					firstPos = sf::Mouse::getPosition(window);
-					const int& col = firstPos.x / gols.cellDist;
-					const int& row = firstPos.y / gols.cellDist;
-
-					grid.flipCellStateAt(row, col);
+					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+					const int& col = mousePos.x / gols.cellDist;
+					const int& row = mousePos.y / gols.cellDist;
+					firstPos = sf::Vector2i(row, col);
+					// grid.flipCellStateAt(row, col);
 
 				}
 				break;
 			case sf::Event::MouseButtonReleased:
 				if (event.mouseButton.button == sf::Mouse::Left) {
-					secondPos = sf::Mouse::getPosition(window);
-					const int& col = secondPos.x / gols.cellDist;
-					const int& row = secondPos.y / gols.cellDist;
-
+					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+					const int& col = mousePos.x / gols.cellDist;
+					const int& row = mousePos.y / gols.cellDist;
+					secondPos = sf::Vector2i(row, col);
+					// DDATool(secondPos, firstPos);
+					bresenhamTool(firstPos.x, firstPos.y, secondPos.x, secondPos.y); // Cleaner endpoints than DDA
 				}
 				break;
 
@@ -417,6 +419,65 @@ private:
 				break;
 			}
 		}
+	}
+
+	void DDATool(const sf::Vector2i& pos1, const sf::Vector2i& pos2) { // Digital differential analyzer
+		float x1, x2, y1, y2;
+		x1 = pos1.x;
+		y1 = pos1.y;
+		x2 = pos2.x;
+		y2 = pos2.y;
+		float dx = x2 - x1;
+		float dy = y2 - y1;
+		float step = 0.0f;
+		float x, y;
+		int i = 0;
+
+		if (pos1 == pos2) {
+			grid.flipCellStateAt(pos1.x, pos1.y);
+			return;
+		}
+
+		if (std::abs(dx) >= std::abs(dy)) {
+			step = std::abs(dx);
+		}
+		else {
+			step = std::abs(dy);
+		}
+
+		dx = dx / step;
+		dy = dy / step;
+		x = x1;
+		y = y1;
+		i = 0;
+
+		while (i <= step) {
+			grid.flipCellStateAt(x, y);
+			x += dx;
+			y += dy;
+			i++;
+		}
+
+
+	}
+
+	void bresenhamTool(int x0, int y0, int x1, int y1)
+	{
+		int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+		int dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+		int err = dx + dy, e2; /* error value e_xy */
+
+		while (true) {  /* loop */
+			grid.flipCellStateAt(x0, y0);
+			if (x0 == x1 && y0 == y1) break;
+			e2 = 2 * err;
+			if (e2 >= dy) { err += dy; x0 += sx; } /* e_xy+e_x > 0 */
+			if (e2 <= dx) { err += dx; y0 += sy; } /* e_xy+e_y < 0 */
+		}
+	}
+
+	void midpointCircleTool(const sf::Vector2i& pos1, const sf::Vector2i& pos2) {
+		
 	}
 
 	void update() {
