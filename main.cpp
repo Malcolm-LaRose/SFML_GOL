@@ -4,7 +4,7 @@
 // Framerate display optimization --> Okay for now, improve by updating at a lower freq
 // Clean up/ refactor code to make more modular/extendable
 // GUI --> ImGUI, later
-// Drawing tools (lines, etc.)
+// Drawing tools (lines, etc.) --> FIX CIRCLE TOOL
 // more optimization...
 // Menus, controls, etc...
 // Options
@@ -379,27 +379,31 @@ private:
 				window.close();
 				running = false;
 				break;
-			case sf::Event::MouseButtonPressed:
-				if (event.mouseButton.button == sf::Mouse::Left) {
-					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-					const int& col = mousePos.x / gols.cellDist;
-					const int& row = mousePos.y / gols.cellDist;
-					firstPos = sf::Vector2i(row, col);
-					// grid.flipCellStateAt(row, col);
+			case sf::Event::MouseButtonPressed: {
+				sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+				const int& col = mousePos.x / gols.cellDist;
+				const int& row = mousePos.y / gols.cellDist;
+				firstPos = sf::Vector2i(row, col);
 
+				if (event.mouseButton.button == sf::Mouse::Left) {
 				}
 				break;
-			case sf::Event::MouseButtonReleased:
+			}
+			case sf::Event::MouseButtonReleased: {
+				sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+				const int& col = mousePos.x / gols.cellDist;
+				const int& row = mousePos.y / gols.cellDist;
+				secondPos = sf::Vector2i(row, col);
+
 				if (event.mouseButton.button == sf::Mouse::Left) {
-					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-					const int& col = mousePos.x / gols.cellDist;
-					const int& row = mousePos.y / gols.cellDist;
-					secondPos = sf::Vector2i(row, col);
 					// DDATool(secondPos, firstPos);
 					bresenhamTool(firstPos.x, firstPos.y, secondPos.x, secondPos.y); // Cleaner endpoints than DDA
 				}
+				else if (event.mouseButton.button == sf::Mouse::Right) {
+					midpointCircleTool(firstPos, secondPos);
+				}
 				break;
-
+			}
 			case sf::Event::KeyPressed:
 				if (event.key.code == sf::Keyboard::Space) { // Single step
 					update();
@@ -476,8 +480,53 @@ private:
 		}
 	}
 
-	void midpointCircleTool(const sf::Vector2i& pos1, const sf::Vector2i& pos2) {
-		
+	void midpointCircleTool(const sf::Vector2i& pos1, const sf::Vector2i& pos2) { // Needs work!
+		//int x = pos1.x;
+		//int y = pos1.y;
+		//int rad = std::sqrt((pos2.x + pos1.x) + (pos2.y + pos1.y));
+		//
+		//float sin45 = 0.7071067;
+		//int range = rad / (2.0f * sin45);
+		//
+		//for (int i = rad; i >= range; --i)
+		//{
+		//	int j = sqrt(rad * rad - i * i);
+		//	for (int k = -j; k <= j; k++)
+		//	{
+		//		//We draw all the 4 sides at the same time.
+		//		grid.flipCellStateAt(x - k, y + i);
+		//		grid.flipCellStateAt(x - k, y - i);
+		//		grid.flipCellStateAt(x + i, y + k);
+		//		grid.flipCellStateAt(x - i, y - k);
+		//	}
+		//}
+		int xc = pos2.x;
+		int yc = pos2.y;
+		int rad = std::sqrt(((pos2.x - pos1.x) * (pos2.x - pos1.x)) + ((pos2.y - pos1.y) * (pos2.y - pos1.y)));
+		int x = 0;
+		int y = rad;
+		int d = 3 - 2 * rad;
+
+		while (y >= x) {
+			if (d > 0) {
+				y--;
+				d += (4 * (x - y)) + 10;
+			}
+			else {
+				d += (4 * x) + 6;
+			}
+			grid.flipCellStateAt(xc + x, yc + y);
+			grid.flipCellStateAt(xc - x, yc + y);
+			grid.flipCellStateAt(xc + x, yc - y);
+			grid.flipCellStateAt(xc - x, yc - y);
+			grid.flipCellStateAt(xc + y, yc + x);
+			grid.flipCellStateAt(xc - y, yc + x);
+			grid.flipCellStateAt(xc + y, yc - x);
+			grid.flipCellStateAt(xc - y, yc - x);
+
+			x++;
+		}
+
 	}
 
 	void update() {
