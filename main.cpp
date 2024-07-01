@@ -1,10 +1,9 @@
 // Game of Life
 // 
 // Goals for AFTER completion --> don't touch until GOL works first, do roughly in order
-// Framerate display optimization
+// Framerate display optimization --> Okay for now, improve by updating at a lower freq
 // Clean up/ refactor code to make more modular/extendable
-// GUI
-// Blue cell under cursor --> DONE
+// GUI --> ImGUI, later
 // Drawing tools (lines, etc.)
 // more optimization...
 // Menus, controls, etc...
@@ -21,12 +20,8 @@
 
 #include <array>
 #include <cmath>
-#include <iostream>
-#include <string>
+// #include <iostream>
 #include <vector>
-
-
-
 
 
 const char digit_pairs[201] = {
@@ -306,7 +301,7 @@ public:
 
 
 	void frameCounterDisplay(const int& frameTime, const int& avg) {
-		frameText.setString("F-Time (us): " + itostr(frameTime) + "\nAvg FPS: " + itostr(avg));
+		frameText.setString("F Time (us): " + itostr(frameTime) + "\nAvg FPS: " + itostr(avg));
 
 		window.draw(frameText);
 	}
@@ -363,6 +358,9 @@ private:
 	bool paused = true; // Start paused
 	float timer = 0; // For simtime calcs
 
+	sf::Vector2i firstPos;
+	sf::Vector2i secondPos;
+
 	void initFont() {
 		font.loadFromFile(".\\Montserrat-Regular.ttf");
 		frameText.setCharacterSize(24);
@@ -383,9 +381,9 @@ private:
 				break;
 			case sf::Event::MouseButtonPressed:
 				if (event.mouseButton.button == sf::Mouse::Left) {
-					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-					const int& col = mousePos.x / gols.cellDist;
-					const int& row = mousePos.y / gols.cellDist;
+					firstPos = sf::Mouse::getPosition(window);
+					const int& col = firstPos.x / gols.cellDist;
+					const int& row = firstPos.y / gols.cellDist;
 
 					grid.flipCellStateAt(row, col);
 
@@ -393,6 +391,9 @@ private:
 				break;
 			case sf::Event::MouseButtonReleased:
 				if (event.mouseButton.button == sf::Mouse::Left) {
+					secondPos = sf::Mouse::getPosition(window);
+					const int& col = secondPos.x / gols.cellDist;
+					const int& row = secondPos.y / gols.cellDist;
 
 				}
 				break;
