@@ -1,12 +1,13 @@
 // Game of Life
 // 
 // Goals for AFTER completion --> don't touch until GOL works first, do roughly in order
-// Automatic updating DONE
-// Rendering optimization DONE
 // Framerate display optimization
-// Blue cell under cursor
+// Clean up/ refactor code to make more modular/extendable
+// Blue cell under cursor --> DONE
+// more optimization...
 // Menus, controls, etc...
 // Options
+// GUI
 // More than one type of life --> look at examples
 
 
@@ -255,7 +256,7 @@ public:
 
 
 	void frameCounterDisplay(const int& frameTime, const int& avg) {
-		frameText.setString("FrameTime (us): " + std::to_string(frameTime) + "\nAvg. FPS: " + std::to_string(avg));
+		frameText.setString("F-Time (us): " + std::to_string(frameTime) + "\nAvg FPS: " + std::to_string(avg));
 
 		window.draw(frameText);
 	}
@@ -382,8 +383,8 @@ private:
 			int i = 0;
 			for (int row = 0; row < gols.rows; ++row) {
 				for (int col = 0; col < gols.cols; ++col) {
-					const int x = col * (gols.cellDist) + gols.borderSize;
-					const int y = row * (gols.cellDist) + gols.borderSize;
+					const int& x = col * (gols.cellDist) + gols.borderSize;
+					const int& y = row * (gols.cellDist) + gols.borderSize;
 
 					const bool& cellState = grid.getCellStateAt(row, col);
 
@@ -400,8 +401,10 @@ private:
 			for (int row = 0; row < gols.rows; ++row) {
 				for (int col = 0; col < gols.cols; ++col) {
 					// Position of upper left corner of cell
-					const int x = col * (gols.cellDist) + gols.borderSize;
-					const int y = row * (gols.cellDist) + gols.borderSize;
+					const int& x = col * (gols.cellDist) + gols.borderSize;
+					const int& y = row * (gols.cellDist) + gols.borderSize;
+
+					const sf::Vector2i& pos = sf::Mouse::getPosition(window);
 
 					const bool& cellState = grid.getCellStateAt(row, col);
 
@@ -438,6 +441,10 @@ private:
 
 	void vertexRenderGrid() {
 
+		sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+		const int& mouseCol = mousePos.x / gols.cellDist;
+		const int& mouseRow = mousePos.y / gols.cellDist;
+
 		if (gols.cellDist == 1) {
 
 			int i = 0;
@@ -447,6 +454,11 @@ private:
 					const bool& cellState = grid.getCellStateAt(row, col);
 
 					sf::Color color = cellState ? Color::PHSORNG : Color::DRKGRY;
+
+					if ((row == mouseRow) && (col == mouseCol)) {
+						color = Color::CYAN;
+					}
+
 
 					cells[i].color = color;
 					++i;
@@ -469,6 +481,10 @@ private:
 					}
 					else {
 						color = Color::DRKGRY;
+					}
+
+					if ((row == mouseRow) && (col == mouseCol)) {
+						color = Color::CYAN;
 					}
 
 					// Set the color of the vertices

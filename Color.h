@@ -13,6 +13,7 @@ struct Color {
     static const sf::Color BLUE;
     static const sf::Color PHSORNG;
     static const sf::Color MAGENTA;
+    static const sf::Color CYAN;
     static const sf::Color DRKGRY;
     static const sf::Color EIGENGRAU;
     static const sf::Color LANDLORDWHITE;
@@ -29,6 +30,7 @@ const sf::Color Color::GREEN(0, 255, 0, 255);
 const sf::Color Color::BLUE(0, 0, 255, 255);
 const sf::Color Color::PHSORNG(255, 204, 0, 255);
 const sf::Color Color::MAGENTA(255, 0, 255, 255);
+const sf::Color Color::CYAN(86, 232, 225, 255);
 const sf::Color Color::DRKGRY(55, 55, 55, 255);
 const sf::Color Color::EIGENGRAU(22, 22, 29, 255);
 const sf::Color Color::LANDLORDWHITE(250, 249, 246, 255);

@@ -18,17 +18,17 @@ struct GoL_Settings {
 	static constexpr char xPos = borderSize;
 	static constexpr char yPos = borderSize;
 
-	static constexpr int cols = 768; // 730 --> x dir
-	static constexpr int rows = 432; // 410 --> y dir
+	static constexpr int cols = 640; // 730 --> x dir
+	static constexpr int rows = 360; // 410 --> y dir
 	static constexpr char cellSpacing = borderSize;
-	static constexpr char cellSize = 3;
+	static constexpr char cellSize = 5;
 	static constexpr char cellDist = cellSize + cellSpacing;
 
 	static constexpr char targetFPS = 60;
 	static constexpr int initScreenWidth = cols * cellDist + borderSize;
 	static constexpr int initScreenHeight = rows * cellDist + borderSize;
 
-	static constexpr char stepsPerSec = 30;
+	static constexpr char stepsPerSec = 22;
 
 private:
 
