@@ -3,8 +3,9 @@
 // Goals for AFTER completion --> don't touch until GOL works first, do roughly in order
 // Framerate display optimization --> Okay for now, improve by updating at a lower freq
 // Clean up/ refactor code to make more modular/extendable
+// Change state to represent colors somehow
 // GUI --> ImGUI, later
-// Drawing tools (lines, etc.) --> FIX CIRCLE TOOL
+// Drawing tools (lines, etc.) 
 // more optimization...
 // Menus, controls, etc...
 // Options
@@ -63,7 +64,9 @@ std::string itostr(unsigned int val)
 	return std::string((char*)it, (char*)&buf[BUFFER_SIZE] - (char*)it);
 }
 
-
+const int dist(const sf::Vector2i& pos1, const sf::Vector2i& pos2) {
+	return std::sqrt(((pos2.x - pos1.x) * (pos2.x - pos1.x)) + ((pos2.y - pos1.y) * (pos2.y - pos1.y)));
+}
 
 
 
@@ -400,8 +403,25 @@ private:
 					bresenhamTool(firstPos.x, firstPos.y, secondPos.x, secondPos.y); // Cleaner endpoints than DDA
 				}
 				else if (event.mouseButton.button == sf::Mouse::Right) {
-					midpointCircleTool(firstPos, secondPos);
+					plotCircle(firstPos, secondPos);
 				}
+				break;
+			}
+			case sf::Event::MouseMoved: {
+				// Draw temporary shapes until mouse is released
+				//sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+				//const int& col = mousePos.x / gols.cellDist;
+				//const int& row = mousePos.y / gols.cellDist;
+				//secondPos = sf::Vector2i(row, col);
+
+				//if (event.mouseButton.button == sf::Mouse::Left) {
+				//	// DDATool(secondPos, firstPos);
+				//	bresenhamTool(firstPos.x, firstPos.y, secondPos.x, secondPos.y); // Cleaner endpoints than DDA
+				//}
+				//else if (event.mouseButton.button == sf::Mouse::Right) {
+				//	plotCircle(firstPos, secondPos);
+				//}
+
 				break;
 			}
 			case sf::Event::KeyPressed:
@@ -480,53 +500,25 @@ private:
 		}
 	}
 
-	void midpointCircleTool(const sf::Vector2i& pos1, const sf::Vector2i& pos2) { // Needs work!
-		//int x = pos1.x;
-		//int y = pos1.y;
-		//int rad = std::sqrt((pos2.x + pos1.x) + (pos2.y + pos1.y));
-		//
-		//float sin45 = 0.7071067;
-		//int range = rad / (2.0f * sin45);
-		//
-		//for (int i = rad; i >= range; --i)
-		//{
-		//	int j = sqrt(rad * rad - i * i);
-		//	for (int k = -j; k <= j; k++)
-		//	{
-		//		//We draw all the 4 sides at the same time.
-		//		grid.flipCellStateAt(x - k, y + i);
-		//		grid.flipCellStateAt(x - k, y - i);
-		//		grid.flipCellStateAt(x + i, y + k);
-		//		grid.flipCellStateAt(x - i, y - k);
-		//	}
-		//}
-		int xc = pos2.x;
-		int yc = pos2.y;
-		int rad = std::sqrt(((pos2.x - pos1.x) * (pos2.x - pos1.x)) + ((pos2.y - pos1.y) * (pos2.y - pos1.y)));
-		int x = 0;
-		int y = rad;
-		int d = 3 - 2 * rad;
+	void plotCircle(const sf::Vector2i& pos1, const sf::Vector2i& pos2)
+	{
+		int xm, ym;
 
-		while (y >= x) {
-			if (d > 0) {
-				y--;
-				d += (4 * (x - y)) + 10;
-			}
-			else {
-				d += (4 * x) + 6;
-			}
-			grid.flipCellStateAt(xc + x, yc + y);
-			grid.flipCellStateAt(xc - x, yc + y);
-			grid.flipCellStateAt(xc + x, yc - y);
-			grid.flipCellStateAt(xc - x, yc - y);
-			grid.flipCellStateAt(xc + y, yc + x);
-			grid.flipCellStateAt(xc - y, yc + x);
-			grid.flipCellStateAt(xc + y, yc - x);
-			grid.flipCellStateAt(xc - y, yc - x);
+		xm = pos2.x;
+		ym = pos2.y;
 
-			x++;
-		}
+		int r = dist(pos1, pos2);
 
+		int x = -r, y = 0, err = 2 - 2 * r; /* II. Quadrant */
+		do {
+			grid.flipCellStateAt(xm - x, ym + y); /*   I. Quadrant */
+			grid.flipCellStateAt(xm - y, ym - x); /*  II. Quadrant */
+			grid.flipCellStateAt(xm + x, ym - y); /* III. Quadrant */
+			grid.flipCellStateAt(xm + y, ym + x); /*  IV. Quadrant */
+			r = err;
+			if (r <= y) err += ++y * 2 + 1;           /* e_xy+e_y < 0 */
+			if (r > x || err > y) err += ++x * 2 + 1; /* e_xy+e_x > 0 or no 2nd y-step */
+		} while (x < 0);
 	}
 
 	void update() {
