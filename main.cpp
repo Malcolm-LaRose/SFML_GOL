@@ -3,7 +3,7 @@
 // Goals for AFTER completion --> don't touch until GOL works first, do roughly in order
 // Framerate display optimization --> Okay for now, improve by updating at a lower freq
 // Clean up/ refactor code to make more modular/extendable
-// Change state to represent colors somehow
+// Change state to represent colors somehow --> USE CHAR, 0 is off, 1 is on, 2 can be unique, etc....
 // GUI --> ImGUI, later
 // Drawing tools (lines, etc.) 
 // more optimization...
@@ -80,7 +80,7 @@ class Cell {
 public:
 	Cell() : state(false) {}
 
-	virtual void updateCellState(const bool& st) {
+	void updateCellState(const bool& st) {
 		state = st;
 	}
 
