@@ -64,16 +64,21 @@ std::string itostr(unsigned int val)
 	return std::string((char*)it, (char*)&buf[BUFFER_SIZE] - (char*)it);
 }
 
+
+
+
 const int dist(const sf::Vector2i& pos1, const sf::Vector2i& pos2) {
 	return std::sqrt(((pos2.x - pos1.x) * (pos2.x - pos1.x)) + ((pos2.y - pos1.y) * (pos2.y - pos1.y)));
 }
 
-
-
-
-
 GoL_Settings& gols = GoL_Settings::getSettings();
 
+
+
+const sf::Color cellStateToColor(const bool& st) {
+	if (st) return Color::PHSORNG;
+	else if (!st) return Color::DRKGRY;
+}
 
 
 class Cell {
@@ -94,7 +99,7 @@ public:
 
 
 private:
-	bool state;
+	bool state; // CHANGE TO A CHAR, DETERMINE PROPERTIRES AS I GO
 
 };
 
@@ -119,6 +124,9 @@ public:
 	}
 
 	void flipCellStateAt(const int& row, const int& col) {
+
+		if (row < 0 || row >= gols.rows || col < 0 || col >= gols.cols) return;
+
 		grid[row][col].flipCellState();
 	}
 
@@ -561,13 +569,8 @@ private:
 
 					const bool& cellState = grid.getCellStateAt(row, col);
 
-					sf::Color color;
-					if (cellState) {
-						color = Color::PHSORNG;
-					}
-					else {
-						color = Color::DRKGRY;
-					}
+					
+					sf::Color color = cellStateToColor(cellState);
 
 
 					// First triangle (top-left, top-right, bottom-right)
@@ -606,7 +609,7 @@ private:
 
 					const bool& cellState = grid.getCellStateAt(row, col);
 
-					sf::Color color = cellState ? Color::PHSORNG : Color::DRKGRY;
+					sf::Color color = cellStateToColor(cellState);
 
 					if ((row == mouseRow) && (col == mouseCol)) {
 						color = Color::CYAN;
@@ -628,13 +631,7 @@ private:
 
 					const bool& cellState = grid.getCellStateAt(row, col);
 
-					sf::Color color;
-					if (cellState) {
-						color = Color::PHSORNG;
-					}
-					else {
-						color = Color::DRKGRY;
-					}
+					sf::Color color = cellStateToColor(cellState);
 
 					if ((row == mouseRow) && (col == mouseCol)) {
 						color = Color::CYAN;
