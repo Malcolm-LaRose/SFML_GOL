@@ -21,11 +21,11 @@ struct GoL_Settings {
 	static constexpr int cols = 640; // 730 --> x dir
 	static constexpr int rows = 360; // 410 --> y dir
 	static constexpr char cellSpacing = borderSize;
-	static constexpr char cellSize = 5;
+	static constexpr char cellSize = 4;
 	static constexpr char cellDist = cellSize + cellSpacing;
 
 	static constexpr char targetFPS = 60;
-	static constexpr int initScreenWidth = cols * cellDist + borderSize;
+	static constexpr int initScreenWidth = cols * cellDist + borderSize; // (640:360) * 4 --> QHD
 	static constexpr int initScreenHeight = rows * cellDist + borderSize;
 
 	static constexpr char stepsPerSec = 22;
