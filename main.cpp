@@ -4,7 +4,7 @@
 // Framerate display optimization --> Okay for now, improve by updating at a lower freq
 // Clean up/ refactor code to make more modular/extendable
 // GUI --> ImGUI, later
-// Drawing tools (lines, etc.) 
+// Drawing tools (lines, etc.) --> Preview before letting mouse go
 // more optimization...
 // Menus, controls, etc...
 // Options
@@ -363,7 +363,7 @@ private:
 					bresenhamTool(firstPos.x, firstPos.y, secondPos.x, secondPos.y); // Cleaner endpoints than DDA
 				}
 				else if (event.mouseButton.button == sf::Mouse::Right) {
-					plotCircle(firstPos, secondPos);
+					plotCircle(secondPos, firstPos);
 				}
 				break;
 			}
